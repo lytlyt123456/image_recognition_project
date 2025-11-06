@@ -204,6 +204,7 @@ class ResidualAttentionBlock(nn.Module):
         self.attn_mask = self.attn_mask.to(dtype=x.dtype) if self.attn_mask is not None else None
 
         if self.attn_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'x': x.cpu(),
@@ -228,12 +229,14 @@ class ResidualAttentionBlock(nn.Module):
             output_dict = torch.load(output_buffer)
 
             return output_dict['output'].to(DEVICE)
-
+            ################################## 云端 ##################################
+        
         else:
             return self.attn(x, x, x, need_weights=False, attn_mask=self.attn_mask)[0]
 
     def multilayer_perception(self, x):
         if self.mlp_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'x': x.cpu(),
@@ -257,7 +260,8 @@ class ResidualAttentionBlock(nn.Module):
             output_dict = torch.load(output_buffer)
 
             return output_dict['output'].to(DEVICE)
-
+            ################################## 云端 ##################################
+        
         else:
             return self.mlp(x)
 
@@ -288,6 +292,7 @@ class Transformer(nn.Module):
 
     def forward(self, x: torch.Tensor):
         if self.resblocks_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'x': x.cpu(),
@@ -310,6 +315,7 @@ class Transformer(nn.Module):
             output_dict = torch.load(output_buffer)
 
             return output_dict['output'].to(DEVICE)
+            ################################## 云端 ##################################
 
         else:
             return self.resblocks(x)
@@ -344,6 +350,7 @@ class VisionTransformer(nn.Module):
 
     def forward(self, x: torch.Tensor):
         if self.vision_conv_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'x': x.cpu()
@@ -365,6 +372,7 @@ class VisionTransformer(nn.Module):
             output_dict = torch.load(output_buffer)
 
             x = output_dict['output'].to(DEVICE)
+            ################################## 云端 ##################################
 
         else:
             x = self.conv1(x)  # shape = [*, width, grid, grid]
@@ -383,6 +391,7 @@ class VisionTransformer(nn.Module):
 
         if self.proj is not None:
             if self.visual_proj_requires_server:
+                ################################## 云端 ##################################
                 buffer = io.BytesIO()
                 torch.save({
                     'x': x.cpu()
@@ -404,6 +413,7 @@ class VisionTransformer(nn.Module):
                 output_dict = torch.load(output_buffer)
 
                 x = output_dict['output'].to(DEVICE)
+                ################################## 云端 ##################################
 
             else:
                 x = x @ self.proj
@@ -546,6 +556,7 @@ class CLIP(nn.Module):
         x = x[torch.arange(x.shape[0]), text.argmax(dim=-1)]
 
         if self.text_proj_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'x': x.cpu()
@@ -567,6 +578,7 @@ class CLIP(nn.Module):
             output_dict = torch.load(output_buffer)
 
             x = output_dict['output'].to(DEVICE)
+            ################################## 云端 ##################################
 
         else:
             x = x @ self.text_projection
@@ -575,6 +587,7 @@ class CLIP(nn.Module):
 
     def forward(self, image, text):
         if self.complete_encoders_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'image': image.cpu(),
@@ -598,6 +611,7 @@ class CLIP(nn.Module):
 
             image_features = output_dict['image_features'].to(DEVICE)
             text_features = output_dict['text_features'].to(DEVICE)
+            ################################## 云端 ##################################
 
         else:
             image_features = self.encode_image(image)
@@ -611,6 +625,7 @@ class CLIP(nn.Module):
         logit_scale = self.logit_scale.exp()
 
         if self.cos_sim_requires_server:
+            ################################## 云端 ##################################
             buffer = io.BytesIO()
             torch.save({
                 'logit_scale': logit_scale.cpu(),
@@ -634,6 +649,7 @@ class CLIP(nn.Module):
             output_dict = torch.load(output_buffer)
 
             logits_per_image =  output_dict['output'].to(DEVICE)
+            ################################## 云端 ##################################
 
         else:
             logits_per_image = logit_scale * image_features @ text_features.t()
