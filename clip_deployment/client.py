@@ -87,10 +87,11 @@ def predict(model, image_paths: List[str], class_names: List[str]):
 
 
 # test
-if __name__ == '__main__':
-    model = build_model_and_deploy(False, False,
-                                   False, False,
-                                   False, False, True)
-    logits_per_image, _ = predict(model, ['C:/Users/yanta/Desktop/image_0005.jpg'],
-                                  ['dog', 'cat', 'cup', 'bowl', 'water'])
-    print(logits_per_image)
+# if __name__ == '__main__':
+#     model = build_model_and_deploy(False, False,
+#                                    False, False,
+#                                    False, False, True)
+#     logits_per_image, _ = predict(model, ['C:/Users/yanta/Desktop/image_0005.jpg'],
+#                                   ['dog', 'cat', 'cup', 'bowl', 'water'])
+#     print(logits_per_image)
+
